@@ -1,0 +1,4 @@
+
+ifneq ($(CONFIG_DOTNET),)
+CONFIGURED_APPS += $(APPDIR)/interpreters/dotnet
+endif
