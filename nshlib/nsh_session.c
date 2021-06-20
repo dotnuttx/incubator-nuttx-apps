@@ -88,7 +88,9 @@ int nsh_session(FAR struct console_stdio_s *pstate,
 
       /* Present a greeting and possibly a Message of the Day (MOTD) */
 
+#if !defined(CONFIG_CDCACM_NON_BLOCKING)
       fputs(g_nshgreeting, pstate->cn_outstream);
+#endif
 
 #ifdef CONFIG_NSH_MOTD
 #ifdef CONFIG_NSH_PLATFORM_MOTD
@@ -116,6 +118,12 @@ int nsh_session(FAR struct console_stdio_s *pstate,
   if (argc < 2)
     {
       /* Then enter the command line parsing loop */
+
+      /* Buuut, first check the CMDLINE */
+      if (strcmp(CONFIG_NSH_CMDLINE, "") != 0)
+      {
+        ret = nsh_parse(vtbl, CONFIG_NSH_CMDLINE);
+      }
 
       for (; ; )
         {

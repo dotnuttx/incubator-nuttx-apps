@@ -1188,6 +1188,12 @@ config NSH_IOBUFFER_SIZE
 endif # NSH_TELNET
 endmenu # Telnet Configuration
 
+config NSH_CMDLINE
+	string "Init cmdline"
+	default ""
+	---help---
+		Let's do gambiarra
+
 config NSH_LOGIN
 	bool
 	default n

@@ -124,6 +124,9 @@ static int nsh_waitusbready(FAR struct console_stdio_s *pstate)
   ssize_t nbytes;
   int nlc;
   int fd;
+#ifdef CONFIG_CDCACM_NON_BLOCKING
+  int attempts = 0;
+#endif
 
   /* Don't start the NSH console until the console device is ready.  Chances
    * are, we get here with no functional console.  The USB console will not
@@ -139,7 +142,12 @@ restart:
     {
       /* Try to open the console */
 
+#ifdef CONFIG_CDCACM_NON_BLOCKING
+      fd = open(CONFIG_NSH_USBCONDEV, O_RDWR | O_NONBLOCK);
+#else
       fd = open(CONFIG_NSH_USBCONDEV, O_RDWR);
+#endif
+
       if (fd < 0)
         {
           /* ENOTCONN means that the USB device is not yet connected.
@@ -151,10 +159,23 @@ restart:
           /* Sleep a bit and try again */
 
           sleep(2);
+
+#ifdef CONFIG_CDCACM_NON_BLOCKING
+          /* in a non blocking configuration try 2 times, if it's not
+           * connected then giveup and put all on the /dev/null
+           */
+          attempts++;
+          
+          if (attempts == 2)
+            {
+              fd = nsh_nullstdio();
+            }
+#endif
         }
     }
   while (fd < 0);
 
+#if !defined(CONFIG_CDCACM_NON_BLOCKING)
   /* Now wait until we successfully read a carriage return a few times.
    * That is a sure way of know that there is something at the other end of
    * the USB serial connection that is ready to talk with us.  The user needs
@@ -196,6 +217,8 @@ restart:
         }
     }
   while (nlc < 3);
+
+#endif
 
   /* Configure standard I/O */
 
