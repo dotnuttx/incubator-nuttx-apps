@@ -1,0 +1,14 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config EXAMPLES_NF_ROMFS
+	tristate "NF ROMFS .pe local"
+	default n
+	depends on FS_ROMFS && BUILD_FLAT
+	---help---
+		Create te ROMFS for .pe storage
+
+if EXAMPLES_ROMFS
+endif
