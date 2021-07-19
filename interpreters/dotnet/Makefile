@@ -167,6 +167,7 @@ CXXSRCS += ../../../nf-interpreter/src/PAL/AsyncProcCall/AsyncCompletions.cpp \
         ../../../nf-interpreter/targets-community/posix/target/PAL/Target_BlockStorage.cpp \
         ../../../nf-interpreter/targets-community/posix/target/PAL/time_stubs.cpp \
         ../../../nf-interpreter/targets-community/posix/target/PAL/Watchdog_stubs.cpp \
+        ../../../nf-interpreter/targets-community/posix/target/PAL/CPU_Gpio_weak.cpp \
         ../../../nf-interpreter/targets-community/posix/target/PAL/CPU_Gpio_Nuttx.cpp
 
 # NANO_CLR
