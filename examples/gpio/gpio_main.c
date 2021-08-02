@@ -41,12 +41,15 @@
 
 static void show_usage(FAR const char *progname)
 {
-  fprintf(stderr, "USAGE: %s [-w <signo>] [-o <value>] <driver-path>\n",
+  fprintf(stderr,
+          "USAGE: %s [-p <pinno>] [-w <signo>] [-o <value>] <driver-path>\n",
           progname);
   fprintf(stderr, "       %s -h\n", progname);
   fprintf(stderr, "Where:\n");
   fprintf(stderr, "\t<driver-path>: The full path to the GPIO pin "
           "driver.\n");
+  fprintf(stderr,
+          "\t-p <pinno>: Set the pin for use for a GPIO lib.\n");
   fprintf(stderr,
           "\t-w <signo>: Wait for an signal if this is an interrupt pin.\n");
   fprintf(stderr,
@@ -71,7 +74,9 @@ int main(int argc, FAR char *argv[])
   bool invalue;
   bool outvalue = false;
   bool haveout = false;
+  bool havepinno = false;
   int signo = 0;
+  int pinno = 0;
   int ndx;
   int ret;
   int fd;
@@ -104,6 +109,27 @@ int main(int argc, FAR char *argv[])
         }
 
       signo = atoi(argv[ndx]);
+
+      if (++ndx >= argc)
+        {
+          fprintf(stderr, "ERROR: Missing required <driver-path>\n");
+          show_usage(argv[0]);
+          return EXIT_FAILURE;
+        }
+    }
+
+  if (strcmp(argv[ndx], "-p") == 0)
+    {
+      havepinno = true;
+
+      if (++ndx >= argc)
+        {
+          fprintf(stderr, "ERROR: Missing argument to -o\n");
+          show_usage(argv[0]);
+          return EXIT_FAILURE;
+        }
+
+      pinno = atoi(argv[ndx]);
 
       if (++ndx >= argc)
         {
@@ -174,15 +200,17 @@ int main(int argc, FAR char *argv[])
 
   /* Read the pin value */
 
-  ret = ioctl(fd, GPIOC_READ, (unsigned long)((uintptr_t)&invalue));
-  if (ret < 0)
-    {
-      int errcode = errno;
-      fprintf(stderr, "ERROR: Failed to read value from %s: %d\n",
-              devpath, errcode);
-      close(fd);
-      return EXIT_FAILURE;
-    }
+  if (!havepinno) {
+    ret = ioctl(fd, GPIOC_READ, (unsigned long)((uintptr_t)&invalue));
+    if (ret < 0)
+      {
+        int errcode = errno;
+        fprintf(stderr, "ERROR: Failed to read value from %s: %d\n",
+                devpath, errcode);
+        close(fd);
+        return EXIT_FAILURE;
+      }
+  }
 
   /* Perform the test based on the pintype and on command line options */
 
@@ -322,6 +350,84 @@ int main(int argc, FAR char *argv[])
                 }
 
               printf("  Verify:        Value=%u\n", (unsigned int)invalue);
+            }
+        }
+        break;
+
+      case GPIO_LIB_PIN:
+        {
+          printf("  Gpio Lib pin:    Value=%u\n", (unsigned int)pinno);
+
+          if (havepinno && haveout)
+            {
+              printf("  Writing:       Value=%u\n", (unsigned int)outvalue);
+
+              /* Set direction */
+
+              ret = ioctl(fd, GPIOC_SETDIR,
+                          (unsigned long)GPIO_OUTPUT_PIN,
+                          (unsigned long)pinno);
+              if (ret < 0)
+                {
+                  int errcode = errno;
+                  fprintf(stderr,
+                          "ERROR: Failed to set dir %u to %d from %s: %d\n",
+                          (unsigned int)GPIO_OUTPUT_PIN,
+                          pinno, devpath, errcode);
+                  close(fd);
+                  return EXIT_FAILURE;
+                }
+
+              /* Write the pin value */
+
+              ret = ioctl(fd, GPIOC_WRITE,
+                          (unsigned long)outvalue,
+                          (unsigned long)pinno);
+              if (ret < 0)
+               {
+                 int errcode = errno;
+                 fprintf(stderr,
+                         "ERROR: Failed to write value %u to %d from %s: %d\n",
+                         (unsigned int)outvalue, pinno, devpath, errcode);
+                 close(fd);
+                 return EXIT_FAILURE;
+               }
+            }
+          else if (havepinno)
+            {
+              /* Set direction */
+
+              ret = ioctl(fd, GPIOC_SETDIR,
+                          (unsigned long)GPIO_INPUT_PIN_PULLDOWN,
+                          (unsigned long)pinno);
+              if (ret < 0)
+                {
+                  int errcode = errno;
+                  fprintf(stderr,
+                          "ERROR: Failed to set dir %u to %d from %s: %d\n",
+                          (unsigned int)GPIO_OUTPUT_PIN,
+                          pinno, devpath, errcode);
+                  close(fd);
+                  return EXIT_FAILURE;
+                }
+
+              /* Read the pin value */
+
+              ret = ioctl(fd, GPIOC_READ,
+                          (unsigned long)((uintptr_t)&invalue),
+                          (unsigned long)pinno);
+              if (ret < 0)
+                {
+                  int errcode = errno;
+                  fprintf(stderr,
+                          "ERROR: Failed to Read value from pin %d from %s: %d\n",
+                          pinno, devpath, errcode);
+                  close(fd);
+                  return EXIT_FAILURE;
+                }
+
+              printf("  Input pin (pull-down):     Value=%u\n",
+                 (unsigned int)invalue);
             }
         }
         break;
