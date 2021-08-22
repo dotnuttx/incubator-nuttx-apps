@@ -70,6 +70,7 @@ int main(int argc, FAR char *argv[])
 {
   FAR char *devpath = NULL;
   enum gpio_pintype_e pintype;
+  struct gpio_lib_args gpio_lib;
   bool havesigno = false;
   bool invalue;
   bool outvalue = false;
@@ -364,9 +365,11 @@ int main(int argc, FAR char *argv[])
 
               /* Set direction */
 
+              gpio_lib.arg = (unsigned long)GPIO_OUTPUT_PIN;
+              gpio_lib.pin = pinno;
+
               ret = ioctl(fd, GPIOC_SETDIR,
-                          (unsigned long)GPIO_OUTPUT_PIN,
-                          (unsigned long)pinno);
+                          (unsigned long)((uintptr_t)&gpio_lib));
               if (ret < 0)
                 {
                   int errcode = errno;
@@ -380,9 +383,11 @@ int main(int argc, FAR char *argv[])
 
               /* Write the pin value */
 
+              gpio_lib.arg = (unsigned long)outvalue;
+              gpio_lib.pin = pinno;
+
               ret = ioctl(fd, GPIOC_WRITE,
-                          (unsigned long)outvalue,
-                          (unsigned long)pinno);
+                          (unsigned long)((uintptr_t)&gpio_lib));
               if (ret < 0)
                {
                  int errcode = errno;
@@ -397,9 +402,11 @@ int main(int argc, FAR char *argv[])
             {
               /* Set direction */
 
+              gpio_lib.arg = (unsigned long)GPIO_INPUT_PIN_PULLDOWN;
+              gpio_lib.pin = pinno;
+
               ret = ioctl(fd, GPIOC_SETDIR,
-                          (unsigned long)GPIO_INPUT_PIN_PULLDOWN,
-                          (unsigned long)pinno);
+                          (unsigned long)((uintptr_t)&gpio_lib));
               if (ret < 0)
                 {
                   int errcode = errno;
@@ -413,9 +420,11 @@ int main(int argc, FAR char *argv[])
 
               /* Read the pin value */
 
+              gpio_lib.arg = (unsigned long)((uintptr_t)&invalue);
+              gpio_lib.pin = pinno;
+
               ret = ioctl(fd, GPIOC_READ,
-                          (unsigned long)((uintptr_t)&invalue),
-                          (unsigned long)pinno);
+                          (unsigned long)((uintptr_t)&gpio_lib));
               if (ret < 0)
                 {
                   int errcode = errno;
