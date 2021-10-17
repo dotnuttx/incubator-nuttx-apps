@@ -41,15 +41,23 @@
 
 static void show_usage(FAR const char *progname)
 {
+#ifdef CONFIG_GPIO_LIB
   fprintf(stderr,
           "USAGE: %s [-p <pinno>] [-w <signo>] [-o <value>] <driver-path>\n",
           progname);
+#else
+  fprintf(stderr,
+          "USAGE: %s [-w <signo>] [-o <value>] <driver-path>\n",
+          progname);
+#endif
   fprintf(stderr, "       %s -h\n", progname);
   fprintf(stderr, "Where:\n");
   fprintf(stderr, "\t<driver-path>: The full path to the GPIO pin "
           "driver.\n");
+#ifdef CONFIG_GPIO_LIB
   fprintf(stderr,
           "\t-p <pinno>: Set the pin for use for a GPIO lib.\n");
+#endif
   fprintf(stderr,
           "\t-w <signo>: Wait for an signal if this is an interrupt pin.\n");
   fprintf(stderr,
@@ -70,7 +78,6 @@ int main(int argc, FAR char *argv[])
 {
   FAR char *devpath = NULL;
   enum gpio_pintype_e pintype;
-  struct gpio_lib_args gpio_lib;
   bool havesigno = false;
   bool invalue;
   bool outvalue = false;
@@ -81,6 +88,9 @@ int main(int argc, FAR char *argv[])
   int ndx;
   int ret;
   int fd;
+#ifdef CONFIG_GPIO_LIB
+  struct gpio_lib_args gpio_lib;
+#endif
 
   /* Parse command line */
 
@@ -355,6 +365,7 @@ int main(int argc, FAR char *argv[])
         }
         break;
 
+#ifdef CONFIG_GPIO_LIB
       case GPIO_LIB_PIN:
         {
           printf("  Gpio Lib pin:    Value=%u\n", (unsigned int)pinno);
@@ -440,6 +451,7 @@ int main(int argc, FAR char *argv[])
             }
         }
         break;
+#endif
 
       default:
         fprintf(stderr, "ERROR: Unrecognized pintype: %d\n", (int)pintype);
