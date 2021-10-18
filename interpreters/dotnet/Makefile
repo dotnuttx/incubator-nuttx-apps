@@ -114,6 +114,7 @@ CXXFLAGS += -DTARGETNAMESTRING='"${NF_BOARD_TARGET}"'
 CXXFLAGS += -DTARGETINFOSTRING='"${NF_PLATFORM_TARGET_STRING}"'
 CXXFLAGS += -DPLATFORMNAMESTRING='"${NF_PLATFORM_TARGET}"'
 CXXFLAGS += -DHAL_REDUCESIZE=TRUE
+#CXXFLAGS += -DRUNTIME_MEMORY_PROFILE__extrasmall=TRUE
 CXXFLAGS += -DBUILD_RTM
 CXXFLAGS += -D${NF_BOARD_CONFIG}
 
@@ -167,7 +168,8 @@ CXXSRCS += ../../../nf-interpreter/src/PAL/AsyncProcCall/AsyncCompletions.cpp \
         ../../../nf-interpreter/targets-community/posix/target/PAL/Target_BlockStorage.cpp \
         ../../../nf-interpreter/targets-community/posix/target/PAL/time_stubs.cpp \
         ../../../nf-interpreter/targets-community/posix/target/PAL/Watchdog_stubs.cpp \
-        ../../../nf-interpreter/targets-community/posix/target/PAL/CPU_Gpio_Nuttx.cpp
+        ../../../nf-interpreter/targets-community/posix/target/PAL/CPU_Gpio_Nuttx.cpp \
+        ../../../nf-interpreter/targets-community/posix/target/PAL/CPU_Gpio_weak.cpp
 
 # NANO_CLR
 CSRCS += ../../../nf-interpreter/src/HAL/nanoHAL_Capabilites.c
