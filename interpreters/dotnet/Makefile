@@ -38,24 +38,10 @@ include $(APPDIR)/Make.defs
 # .NET nanoFramework
 
 MAINSRC = ../../../nf-interpreter/targets-community/posix/main.cpp
-#MAINSRC = test_main.cpp
 
 # set flags
-#CXXFLAGS += -fno-builtin -Wall -Wshadow -Wundef -fno-strict-aliasing -fno-strength-reduce -fomit-frame-pointer
-#CXXFLAGS += -D_LIBCPP_BUILD_STATIC -D_LIBCPP_NO_EXCEPTIONS
-CXXFLAGS += -fno-exceptions -fcheck-new -fno-rtti -pedantic -faligned-new
-CXXFLAGS += -std=c++14 -Os -fdata-sections -ffunction-sections -Wl,--gc-sections -Wno-attributes -Wno-narrowing -fpermissive
-#CXXFLAGS += -nostdinc++ -latomic
-#CXXFLAGS += -std=c++14 -Os -Wno-attributes -Wno-narrowing -fpermissive
-#CXXFLAGS += -DCONFIG_WCHAR_BUILTIN
-
-#CFLAGS += -fno-builtin -Wall -Wshadow -Wundef -fno-strict-aliasing -fno-strength-reduce -fomit-frame-pointer
-#CFLAGS += -D_LIBCPP_BUILD_STATIC -D_LIBCPP_NO_EXCEPTIONS
-CFLAGS += -fno-exceptions -fcheck-new -fno-rtti -pedantic -faligned-new
-CFLAGS += -std=c++14 -Os -fdata-sections -ffunction-sections -Wl,--gc-sections -Wno-attributes -Wno-narrowing -fpermissive
-#CFLAGS += -nostdinc++ -latomic
-#CFLAGS += -std=c++14 -Os -Wno-attributes -Wno-narrowing -fpermissive
-#CFLAGS += -DCONFIG_WCHAR_BUILTIN
+CXXFLAGS += -std=c++17 -Os -fdata-sections -ffunction-sections -Wno-attributes -Wno-narrowing -fno-exceptions -fcheck-new -fno-rtti -Wno-undef
+CFLAGS += -Os -fdata-sections -ffunction-sections -Wno-attributes -Wno-narrowing -Wno-strict-prototypes
 
 # set include directories
 CXXFLAGS += -I../../../nf-interpreter/src/CLR/Include
@@ -116,10 +102,11 @@ CXXFLAGS += -DPLATFORMNAMESTRING='"${NF_PLATFORM_TARGET}"'
 CXXFLAGS += -DHAL_REDUCESIZE=TRUE
 #CXXFLAGS += -DRUNTIME_MEMORY_PROFILE__extrasmall=TRUE
 CXXFLAGS += -DBUILD_RTM
+CXXFLAGS += -DNANOCLR_GRAPHICS=FALSE
 CXXFLAGS += -D${NF_BOARD_CONFIG}
 
 CFLAGS += -D__nuttx__
-#CFLAGS += -DDEBUG
+CFLAGS += -DDEBUG
 CFLAGS += -DNANOCLR_LIGHT_MATH=TRUE
 CFLAGS += -DNANOCLR_REFLECTION=TRUE
 CFLAGS += -DNANOCLR_SYSTEM_COLLECTIONS=TRUE
@@ -135,7 +122,7 @@ CFLAGS += -DTARGETINFOSTRING='"CLR_POSIX"'
 CFLAGS += -DPLATFORMNAMESTRING='"POSIX"'
 CFLAGS += -DHAL_REDUCESIZE=TRUE
 CFLAGS += -DBUILD_RTM
-CFLAGS += -DBOARD_PI_PICO
+CFLAGS += -D${NF_BOARD_CONFIG}
 
 # source code
 
